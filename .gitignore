@@ -1,6 +1,6 @@
 .env
 AutoPaperGen\data\
-.trae\
+.trae
 AutoPaperGen\src\__pycache__\
 AutoPaperGen\src\rag\__pycache__\
 AutoPaperGen\src\agents\__pycache__\
