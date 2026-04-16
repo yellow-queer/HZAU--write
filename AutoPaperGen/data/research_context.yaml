@@ -1,0 +1,85 @@
+title: "基于序列图像融合的实蝇侵染柑橘无损检测方法研究"
+
+research_summary: >
+  本研究针对柑橘实蝇侵染检测中传统破坏性方法效率低、精度差的问题，
+  提出了一种基于多视角图像融合的无损检测方法。设计了旋转平台采集装置，
+  构建了以ConvNeXt为骨干的多视角注意力融合网络，并开发了集成Qwen大模型
+  与RAG知识库的智能检测Web系统。
+
+innovations:
+  - "设计了'4张水平环绕+1张顶角'的多视角图像采集方案，实现柑橘表面全覆盖"
+  - "提出基于ConvNeXt骨干与多头自注意力机制的多视角特征融合网络，患虫样本召回率达100%"
+  - "构建了集成Qwen大模型与FAISS RAG知识库的智能检测问答系统，实现专业解读与防治指导"
+
+methodology:
+  data_collection: >
+    采用旋转平台与双摄像头采集装置，每个柑橘样本拍摄5张图像：
+    4张水平环绕图（每隔90度）+ 1张顶角图。采集环境为自然光照，
+    背景为黑色绒布以减少干扰。
+
+  model_architecture: >
+    以ConvNeXt-Tiny为骨干网络提取各视角特征，引入可学习位置编码标识视角顺序，
+    通过多头自注意力机制（Multi-Head Attention）进行跨视角特征融合，
+    最终通过全连接层输出分类结果（健康/患虫）。
+
+  comparison_models:
+    - name: "单视角模型"
+      description: "仅使用单张图像，ConvNeXt-Tiny直接分类"
+    - name: "多视角简单拼接模型"
+      description: "将5张图像特征简单拼接后分类"
+    - name: "CNN-LSTM序列模型"
+      description: "用LSTM处理多视角特征序列"
+    - name: "CNN-LSTM-Attention模型"
+      description: "在LSTM基础上加入注意力机制"
+
+  training_strategy: >
+    损失函数：交叉熵损失；优化器：AdamW（weight_decay=0.05）；
+    学习率调度：余弦退火（初始lr=1e-4，T_max=50）；
+    Batch Size：32；训练轮次：100 epochs；数据增强：随机翻转、色彩抖动。
+
+experiment_results:
+  environment: >
+    GPU: NVIDIA RTX 4090 (24GB)；CPU: Intel i9-13900K；
+    框架: PyTorch 2.0 + timm；OS: Ubuntu 22.04
+
+  key_metrics:
+    - metric: "Accuracy"
+      our_method: "96.5%"
+      best_baseline: "93.2%"
+    - metric: "Recall（患虫样本）"
+      our_method: "100%"
+      best_baseline: "91.8%"
+    - metric: "F1-Score"
+      our_method: "97.1%"
+      best_baseline: "93.5%"
+
+  key_findings:
+    - "注意力融合模型在保持高准确率的同时，实现了患虫样本100%召回率，这对实际应用至关重要"
+    - "Grad-CAM热力图显示模型能准确聚焦柑橘患虫关键区域（产卵孔、腐烂斑）"
+    - "多视角融合相比单视角提升约3.3%准确率，验证了多视角信息的有效性"
+
+system_implementation:
+  architecture: >
+    后端：Flask框架；前端：响应式设计，采用苹果毛玻璃风格（Glassmorphism）；
+    检测模块：ConvNeXt-Tiny离线推理；问答模块：Qwen-plus大模型 + FAISS RAG知识库；
+    部署：本地运行 + Ngrok/Cloudflare内网穿透实现公网访问。
+
+  core_features:
+    - "图像质量自动评估（清晰度、亮度、对比度）"
+    - "柑橘实蝇侵染智能检测"
+    - "基于RAG的专业问答（病害防治、检测原理等）"
+    - "检测历史记录与统计分析"
+
+limitations_and_future:
+  limitations:
+    - "数据集规模有限，仅包含单一品种柑橘"
+    - "未在边缘计算设备上部署验证"
+    - "RAG知识库覆盖范围有待扩展"
+  future_work:
+    - "扩展至多品种柑橘和其他水果"
+    - "在Jetson等边缘设备上部署轻量化模型"
+    - "融合近红外光谱等多模态数据提升检测精度"
+
+additional_notes: >
+  本研究的核心亮点是患虫样本100%召回率，这在实际果园检测中非常重要，
+  因为漏检患虫果会造成严重经济损失。请在论文中重点强调这一点。

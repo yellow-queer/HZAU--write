@@ -1,0 +1,68 @@
+TY  - JOUR
+AU  - Vaswani, Ashish
+AU  - Shazeer, Noam
+AU  - Parmar, Niki
+AU  - Uszkoreit, Jakob
+AU  - Jones, Llion
+AU  - Gomez, Aidan N.
+AU  - Kaiser, Lukasz
+AU  - Polosukhin, Illia
+TI  - Attention Is All You Need
+JO  - Advances in Neural Information Processing Systems
+VL  - 30
+PY  - 2017
+ID  - vaswani2017attention
+AB  - The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.
+ER  - 
+
+TY  - CONF
+AU  - He, Kaiming
+AU  - Zhang, Xiangyu
+AU  - Ren, Shaoqing
+AU  - Sun, Jian
+TI  - Deep Residual Learning for Image Recognition
+T2  - Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition
+SP  - 770
+EP  - 778
+PY  - 2016
+ID  - he2016deep
+AB  - Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs.
+ER  - 
+
+TY  - JOUR
+AU  - LeCun, Yann
+AU  - Bengio, Yoshua
+AU  - Hinton, Geoffrey
+TI  - Deep Learning
+JO  - Nature
+VL  - 521
+IS  - 7553
+SP  - 436
+EP  - 444
+PY  - 2015
+ID  - lecun2015deep
+AB  - Deep learning allows computational models that are composed of multiple processing layers to learn representations of data with multiple levels of abstraction. These methods have dramatically improved the state-of-the-art in speech recognition, visual object recognition, object detection and many other domains.
+ER  - 
+
+TY  - BOOK
+AU  - Goodfellow, Ian
+AU  - Bengio, Yoshua
+AU  - Courville, Aaron
+TI  - Deep Learning
+PB  - MIT Press
+PY  - 2016
+ID  - goodfellow2016deep
+AB  - Deep learning is a form of machine learning that enables computers to learn from experience and understand the world in terms of a hierarchy of concepts.
+ER  - 
+
+TY  - JOUR
+AU  - Krizhevsky, Alex
+AU  - Sutskever, Ilya
+AU  - Hinton, Geoffrey E.
+TI  - ImageNet Classification with Deep Convolutional Neural Networks
+JO  - Advances in Neural Information Processing Systems
+VL  - 25
+PY  - 2012
+ID  - krizhevsky2012imagenet
+AB  - We trained a large, deep convolutional neural network to classify the 1.2 million high-resolution images in the ImageNet LSVRC-2010 contest into the 1000 different classes.
+ER  - 
