@@ -67,51 +67,34 @@ def create_qwen_llm(model: str = "qwen-plus", temperature: float = 0.7):
         return None
 
 
-def get_qwen_embedding_model(model_name: str = "text-embedding-v2"):
+def get_qwen_embedding_model(model_name: str = None):
     """
-    创建 Qwen 嵌入模型（LlamaIndex 兼容）
+    创建嵌入模型（仅使用 HuggingFace，避免 Qwen API 兼容性问题）
     
     Args:
-        model_name: 嵌入模型名称
+        model_name: 已弃用，此参数保留仅用于向后兼容性
     
     Returns:
         LlamaIndex 兼容的嵌入模型实例
     """
+    # 使用 HuggingFace bge-small-zh-v1.5 作为唯一的嵌入模型选择
+    # 原因：
+    # 1. 本地离线运行，无需 API 调用
+    # 2. 支持中文，性能好
+    # 3. 避免 Qwen API text-embedding-v2 与 OpenAI SDK 不兼容的问题
     try:
-        from llama_index.embeddings.openai import OpenAIEmbedding
+        from llama_index.embeddings.huggingface import HuggingFaceEmbedding
         
-        config = load_qwen_config()
+        embed_model = HuggingFaceEmbedding(
+            model_name="BAAI/bge-small-zh-v1.5",
+            cache_folder=None,  # 使用默认缓存目录
+        )
         
-        try:
-            embed_model = OpenAIEmbedding(
-                model=model_name,
-                api_key=config["api_key"],
-                api_base=config["base_url"],
-                api_type="openai"
-            )
-            
-            print(f"已初始化 Qwen Embedding: {model_name}")
-            return embed_model
-            
-        except Exception as e:
-            print(f"警告：Qwen 嵌入模型初始化失败：{e}")
-            print("正在回退到 HuggingFace bge-small-zh-v1.5 模型...")
-            
-            try:
-                from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-                
-                embed_model = HuggingFaceEmbedding(
-                    model_name="BAAI/bge-small-zh-v1.5"
-                )
-                
-                print("已成功初始化 HuggingFace Embedding: bge-small-zh-v1.5")
-                return embed_model
-                
-            except ImportError as hf_error:
-                print(f"错误：无法导入 HuggingFace 嵌入模型：{hf_error}")
-                print("请运行：pip install llama-index-embeddings-huggingface")
-                return None
+        print("✓ 已初始化 HuggingFace Embedding: bge-small-zh-v1.5")
+        return embed_model
         
-    except ImportError as e:
-        print(f"警告：无法导入嵌入模型：{e}")
+    except ImportError as hf_error:
+        print(f"✗ 错误：无法导入 HuggingFace 嵌入模型")
+        print(f"  原因：{hf_error}")
+        print(f"  解决：pip install llama-index-embeddings-huggingface")
         return None
