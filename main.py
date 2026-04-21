@@ -28,6 +28,7 @@ from src.workflow_hzau import create_workflow
 from src.render import render_final_paper, create_default_template
 from src.rag.lit_index import LiteratureIndex
 from src.rag.code_index import CodebaseIndex
+from src.rag.content_index import ContentIndex
 from src.utils.qwen_config import create_qwen_llm, get_qwen_embedding_model, load_qwen_config
 from src.utils.interactive_input import get_interactive_inputs
 
@@ -71,7 +72,9 @@ def run(
     word_limit: int = 2000,
     focus: str = "",
     writing_notes: Optional[List[str]] = None,
-    load_codebase: bool = False
+    load_codebase: bool = False,
+    load_content: bool = False,
+    enable_image_processing: bool = True
 ) -> str:
     """
     运行 AutoPaperGen 系统
@@ -87,6 +90,8 @@ def run(
         focus: 写作重心描述（可选）
         writing_notes: 特殊写作要求列表（可选）
         load_codebase: 是否加载代码库索引（默认 False）
+        load_content: 是否加载内容库索引（默认 False）
+        enable_image_processing: 是否启用图像处理（需要 Qwen-VL API，默认 True）
     
     Returns:
         生成的论文文件路径
@@ -150,6 +155,23 @@ def run(
         print("⚠ 跳过代码库加载，将仅使用文献库生成论文")
         code_index = None
     
+    # 根据用户选择决定是否初始化内容索引
+    if load_content:
+        print("正在加载内容库并构建索引...")
+        content_index = ContentIndex(
+            content_dir=str(base_dir / "data" / "content"),
+            persist_dir=str(base_dir / ".chroma_content")
+        )
+        content_index.build_index(
+            llm=llm, 
+            embed_model=embed_model,
+            enable_image_processing=enable_image_processing
+        )
+        print("✓ 内容库索引构建完成")
+    else:
+        print("⚠ 跳过内容库加载")
+        content_index = None
+    
     # 创建工作流
     workflow = create_workflow()
     
@@ -175,6 +197,7 @@ def run(
         "llm": llm,
         "literature_retriever": lit_index,
         "code_retriever": code_index,  # 当 load_codebase=False 时为 None
+        "content_retriever": content_index,  # 当 load_content=False 时为 None
         "style_retriever": None,
         "research_context": research_context,
         "word_limit": word_limit,
@@ -221,7 +244,9 @@ if __name__ == "__main__":
             word_limit=inputs["word_limit"],
             focus=inputs["focus"],
             writing_notes=inputs["writing_notes"],
-            load_codebase=inputs["load_codebase"]
+            load_codebase=inputs["load_codebase"],
+            load_content=inputs.get("load_content", False),
+            enable_image_processing=inputs.get("enable_image_processing", True)
         )
     else:
         # 使用命令行参数模式
@@ -233,6 +258,8 @@ if __name__ == "__main__":
         parser.add_argument("--focus", default="", help="写作重心描述")
         parser.add_argument("--notes", action="append", default=[], help="特殊写作要求（可多次指定）")
         parser.add_argument("--load-codebase", action="store_true", help="加载代码库索引（默认不加载）")
+        parser.add_argument("--load-content", action="store_true", help="加载内容库索引（默认不加载）")
+        parser.add_argument("--disable-image-processing", action="store_true", help="禁用图像处理（节省 API 费用）")
         
         args = parser.parse_args()
         
@@ -243,7 +270,9 @@ if __name__ == "__main__":
             word_limit=args.word_limit,
             focus=args.focus,
             writing_notes=args.notes,
-            load_codebase=args.load_codebase
+            load_codebase=args.load_codebase,
+            load_content=args.load_content,
+            enable_image_processing=not args.disable_image_processing
         )
     
     print(f"\n完成！论文已保存到：{output_file}")

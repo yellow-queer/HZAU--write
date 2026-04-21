@@ -340,9 +340,9 @@ def get_retrieval_queries(
         retrieval_queries: 可选的自定义检索查询配置
         
     Returns:
-        检索查询字典，包含 "literature" 和 "code" 两个键
+        检索查询字典，包含 "literature"、"code" 和 "content" 三个键
     """
-    result = {"literature": [], "code": []}
+    result = {"literature": [], "code": [], "content": []}
     
     if retrieval_queries and chapter_num in retrieval_queries:
         chapter_queries = retrieval_queries[chapter_num]
@@ -350,6 +350,8 @@ def get_retrieval_queries(
             result["literature"] = chapter_queries["literature"]
         if "code" in chapter_queries:
             result["code"] = chapter_queries["code"]
+        if "content" in chapter_queries:
+            result["content"] = chapter_queries["content"]
         return result
     
     chapter_config = DEFAULT_CHAPTER_CONFIGS.get(chapter_num, {})
@@ -367,6 +369,12 @@ def get_retrieval_queries(
             f"{topic} 数据处理",
             f"{topic} 模型代码"
         ]
+    
+    result["content"] = [
+        f"{topic} 实验结果",
+        f"{topic} 数据分析",
+        f"{topic} 项目介绍"
+    ]
     
     return result
 
@@ -391,13 +399,22 @@ def _perform_retrieval(
     
     literature_retriever = state.get("literature_retriever")
     code_retriever = state.get("code_retriever")
+    content_retriever = state.get("content_retriever")
+    
+    research_context = state.get("research_context", {})
+    content_chapter_keys = research_context.get("content_chapter_keys", [
+        "write_chapter2", "write_chapter3", "write_chapter4", "write_chapter5"
+    ])
+    chapters = research_context.get("chapters", {})
+    content_chapter_names = [chapters.get(key, key) for key in content_chapter_keys]
+    should_retrieve_content = chapter_name in content_chapter_names
     
     if queries.get("literature") and literature_retriever:
         for query in queries["literature"]:
             try:
                 results = literature_retriever.query(query, top_k=3)
                 if results:
-                    retrieval_results.append(f"[文献检索] {query}:\n{results}")
+                    retrieval_results.append(results)
             except Exception as e:
                 print(f"⚠ 文献检索失败 '{query}': {e}")
     
@@ -406,9 +423,18 @@ def _perform_retrieval(
             try:
                 results = code_retriever.query(query, top_k=3)
                 if results:
-                    retrieval_results.append(f"[代码检索] {query}:\n{results}")
+                    retrieval_results.append(results)
             except Exception as e:
                 print(f"⚠ 代码检索失败 '{query}': {e}")
+    
+    if should_retrieve_content and queries.get("content") and content_retriever:
+        for query in queries["content"]:
+            try:
+                results = content_retriever.query(query, top_k=3)
+                if results:
+                    retrieval_results.append(results)
+            except Exception as e:
+                print(f"⚠ 内容检索失败 '{query}': {e}")
     
     if retrieval_results:
         return "\n\n".join(retrieval_results)
@@ -464,7 +490,7 @@ def _write_chapter(
     )
     
     if retrieval_context:
-        human_prompt += f"\n\n相关检索结果:\n{retrieval_context}"
+        human_prompt += f"\n\n参考资料:\n{retrieval_context}"
     
     llm = state.get("llm")
     if llm is None:
@@ -480,6 +506,8 @@ def _write_chapter(
 - 使用规范的学术语言
 - 逻辑清晰，层次分明
 - 图表、公式使用 LaTeX 格式
+- 将参考资料自然融入正文，不要出现"根据某文件"、"某文档中提到"等引用标识
+- 避免在正文中标注文件来源或路径
 
 {additional_notes if additional_notes else ""}"""
     

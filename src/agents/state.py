@@ -14,6 +14,7 @@ class PaperDraftState(TypedDict):
     llm: Any
     literature_retriever: Any
     code_retriever: Any
+    content_retriever: Any
     style_retriever: Any
     research_context: Dict[str, Any]
     citation_texts: Dict[str, str]

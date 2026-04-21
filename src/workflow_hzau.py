@@ -22,6 +22,13 @@ DEFAULT_CODE_CHAPTER_KEYS = [
     "write_chapter5"
 ]
 
+DEFAULT_CONTENT_CHAPTER_KEYS = [
+    "write_chapter2",
+    "write_chapter3",
+    "write_chapter4",
+    "write_chapter5"
+]
+
 
 def get_chapter_names(state: Dict[str, Any]) -> Dict[str, str]:
     research_context = state.get("research_context", {})
@@ -36,6 +43,13 @@ def get_code_chapters(state: Dict[str, Any]) -> List[str]:
     code_chapter_keys = research_context.get("code_chapter_keys", DEFAULT_CODE_CHAPTER_KEYS)
     chapter_names = get_chapter_names(state)
     return [chapter_names.get(key, key) for key in code_chapter_keys]
+
+
+def get_content_chapters(state: Dict[str, Any]) -> List[str]:
+    research_context = state.get("research_context", {})
+    content_chapter_keys = research_context.get("content_chapter_keys", DEFAULT_CONTENT_CHAPTER_KEYS)
+    chapter_names = get_chapter_names(state)
+    return [chapter_names.get(key, key) for key in content_chapter_keys]
 
 
 def init_state(state: Dict[str, Any]) -> Dict[str, Any]:

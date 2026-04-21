@@ -151,8 +151,63 @@ def get_load_codebase(default: bool = False) -> bool:
             print("❌ 请输入 'y' 或 'n'，或直接回车使用默认值\n")
 
 
+def get_load_content(default: bool = False) -> bool:
+    """获取是否加载内容库的选项"""
+    print("\n" + "-" * 40)
+    print("内容库加载选项：")
+    print("  - 选择 'y': 将加载 data/content 文件夹下的内容文件")
+    print("  - 内容库可包含项目介绍、实验结果、数据分析等参考内容")
+    print("  - 支持 txt, md, pdf, docx, xlsx, jpg 等格式")
+    print("  - 选择 'n': 跳过内容库加载")
+    print("-" * 40)
+    
+    default_str = "y" if default else "n"
+    while True:
+        value = input(f"是否加载内容库？(y/n) [{default_str}]: ").strip().lower()
+        
+        if not value:
+            print(f"✓ 使用默认值：{'加载内容库' if default else '跳过内容库加载'}")
+            return default
+        
+        if value in ('y', 'yes'):
+            print("✓ 将加载内容库并构建索引")
+            return True
+        elif value in ('n', 'no'):
+            print("✓ 跳过内容库加载")
+            return False
+        else:
+            print("❌ 请输入 'y' 或 'n'，或直接回车使用默认值\n")
+
+
+def get_enable_image_processing(default: bool = True) -> bool:
+    """获取是否启用图像处理的选项"""
+    print("\n" + "-" * 40)
+    print("图像处理选项：")
+    print("  - 选择 'y': 使用 Qwen-VL API 处理图像文件（需要 API 费用）")
+    print("  - 选择 'n': 跳过图像文件处理（节省 API 费用）")
+    print("-" * 40)
+    
+    default_str = "y" if default else "n"
+    while True:
+        value = input(f"是否启用图像处理？(y/n) [{default_str}]: ").strip().lower()
+        
+        if not value:
+            print(f"✓ 使用默认值：{'启用图像处理' if default else '禁用图像处理'}")
+            return default
+        
+        if value in ('y', 'yes'):
+            print("✓ 将启用图像处理（使用 Qwen-VL API）")
+            return True
+        elif value in ('n', 'no'):
+            print("✓ 禁用图像处理（节省 API 费用）")
+            return False
+        else:
+            print("❌ 请输入 'y' 或 'n'，或直接回车使用默认值\n")
+
+
 def print_summary(topic: str, context: Optional[str], template: Optional[str], 
-                  word_limit: int, focus: str, notes: List[str], load_codebase: bool):
+                  word_limit: int, focus: str, notes: List[str], load_codebase: bool,
+                  load_content: bool = False, enable_image_processing: bool = True):
     """打印配置摘要"""
     print("\n" + "=" * 60)
     print("配置摘要")
@@ -163,6 +218,9 @@ def print_summary(topic: str, context: Optional[str], template: Optional[str],
     print(f"字数限制：{word_limit} 字")
     print(f"写作重心：{focus if focus else '（无）'}")
     print(f"加载代码库：{'是' if load_codebase else '否'}")
+    print(f"加载内容库：{'是' if load_content else '否'}")
+    if load_content:
+        print(f"启用图像处理：{'是' if enable_image_processing else '否'}")
     if notes:
         print("特殊要求：")
         for i, note in enumerate(notes, 1):
@@ -191,6 +249,8 @@ def get_interactive_inputs() -> dict:
         - focus: str
         - writing_notes: List[str]
         - load_codebase: bool
+        - load_content: bool
+        - enable_image_processing: bool
     """
     print_welcome()
     
@@ -201,9 +261,15 @@ def get_interactive_inputs() -> dict:
     focus = get_focus()
     writing_notes = get_notes()
     load_codebase = get_load_codebase()
+    load_content = get_load_content()
+    
+    enable_image_processing = True
+    if load_content:
+        enable_image_processing = get_enable_image_processing()
     
     # 打印配置摘要并确认
-    if not print_summary(topic, context_path, template_path, word_limit, focus, writing_notes, load_codebase):
+    if not print_summary(topic, context_path, template_path, word_limit, focus, 
+                        writing_notes, load_codebase, load_content, enable_image_processing):
         exit(0)
     
     return {
@@ -214,4 +280,6 @@ def get_interactive_inputs() -> dict:
         "focus": focus,
         "writing_notes": writing_notes,
         "load_codebase": load_codebase,
+        "load_content": load_content,
+        "enable_image_processing": enable_image_processing,
     }
