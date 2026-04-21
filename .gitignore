@@ -37,10 +37,6 @@ env/
 *~
 
 # 数据文件（用户需要自己准备）
-data/literature/*.xml
-data/literature/*.ris
-data/literature/*.txt
-data/literature/pdf/*.pdf
 data/codebase/**
 
 # 输出文件
@@ -64,7 +60,4 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Trae 配置
-.trae/
 
-data/literature/柑橘.xml
